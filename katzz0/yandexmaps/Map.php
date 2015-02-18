@@ -2,7 +2,8 @@
 namespace katzz0\yandexmaps;
 
 use yii\base\Exception;
-use katzz0\yandexmaps\Interfaces;
+use katzz0\yandexmaps\Interfaces\GeoObjectCollection;
+use katzz0\yandexmaps\Interfaces\EventAggregate;
 
 /**
  * Class Map
@@ -11,7 +12,7 @@ use katzz0\yandexmaps\Interfaces;
  * @property array $objects
  * @property array $controls
  */
-class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfaces\EventAggregate
+class Map extends JavaScript implements GeoObjectCollection, EventAggregate
 {
     const CONTROL_MAP_TOOLS = 'mapTools';
     const CONTROL_MINI_MAP = 'miniMap';
@@ -20,7 +21,6 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
     const CONTROL_TRAFFIC = 'trafficControl';
     const CONTROL_TYPE_SELECTOR = 'typeSelector';
     const CONTROL_ZOOM = 'zoomControl';
-    const CONTROL_SMALL_ZOOM = 'smallZoomControl';
 
     const BEHAVIOR_DEFAULT = 'default';
     const BEHAVIOR_DRAG = 'drag';
@@ -32,22 +32,40 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
     const BEHAVIOR_RULER = 'ruler';
     const BEHAVIOR_ROUTE_EDITOR = 'routeEditor';
 
-    /** @var array */
-    public $state = array();
-    /** @var array */
-    public $options = array();
+    /**
+     * @var array Map state options
+     */
+    public $state = [];
 
-    public $use_clusterer = false;
+    /**
+     * @var array
+     */
+    public $options = [];
 
-    /** @var string */
-    private $_id;
-    /** @var array */
-    private $_objects = array();
-    /** @var array */
-    private $_controls = array();
+    /**
+     * @var bool Использовать ли кластеризатор
+     */
+    public $useClusterer = false;
 
-    /** @var array */
-    private $_events = array();
+    /**
+     * @var string
+     */
+    private $id;
+
+    /**
+     * @var array
+     */
+    private $objects = [];
+
+    /**
+     * @var array Control item in the map
+     */
+    private $controls = [];
+
+    /**
+     * @var array
+     */
+    private $events = [];
 
     /**
      * @param string $id
@@ -96,10 +114,10 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function getId()
     {
-        if (empty($this->_id)) {
+        if (empty($this->id)) {
             throw new Exception('Empty map ID.');
         }
-        return $this->_id;
+        return $this->id;
     }
 
     /**
@@ -107,7 +125,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function setId($id)
     {
-        $this->_id = (string)$id;
+        $this->id = (string)$id;
     }
 
     /**
@@ -115,7 +133,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function setEvents(array $events)
     {
-        $this->_events = $events;
+        $this->events = $events;
     }
 
     /**
@@ -123,7 +141,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function getEvents()
     {
-        return $this->_events;
+        return $this->events;
     }
 
     /**
@@ -131,7 +149,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function getObjects()
     {
-        return $this->_objects;
+        return $this->objects;
     }
 
     /**
@@ -139,7 +157,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function setObjects(array $objects = [])
     {
-        $this->_objects = array();
+        $this->objects = [];
         foreach ($objects as $object) {
             $this->addObject($object);
         }
@@ -151,7 +169,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function addObject($object)
     {
-        $this->_objects[] = $object;
+        $this->objects[] = $object;
         return $this;
     }
 
@@ -160,7 +178,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function getControls()
     {
-        return $this->_controls;
+        return $this->controls;
     }
 
     /**
@@ -168,7 +186,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
      */
     public function setControls(array $controls)
     {
-        $this->_controls = array();
+        $this->controls = [];
         foreach ($controls as $control) {
             $this->addControl($control);
         }
@@ -177,7 +195,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
     /**
      * The control.
      * ```php
-     * $map->addControl(array('smallZoomControl', array(
+     * $map->addControl(array('zoomControl', array(
      *    'left' => '5px',
      *    'top' => '5px',
      * )));
@@ -194,7 +212,7 @@ class Map extends JavaScript implements Interfaces\GeoObjectCollection, Interfac
         } elseif (is_array($control) && (!isset($control[0]) || !is_string($control[0]))) {
             throw new Exception('Invalid control.');
         }
-        $this->_controls[$control[0]] = $control;
+        $this->controls[$control[0]] = $control;
         return $this;
     }
 }

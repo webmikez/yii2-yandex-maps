@@ -30,15 +30,15 @@ class Canvas extends Widget
     /**
      * @var array
      */
-    public $htmlOptions = array(
+    public $htmlOptions = [
         'class' => 'yandex-map',
         'style' => 'height: 100%; width: 100%;',
-    );
+    ];
 
     /**
      * @var Map Current Map object
      */
-    private $_map;
+    private $map;
 
     /**
      * @var bool Is already rendered map
@@ -73,10 +73,10 @@ class Canvas extends Widget
      */
     public function getMap()
     {
-        if (null === $this->_map) {
+        if (null === $this->map) {
             throw new Exception('Orphan map canvas.');
         }
-        return $this->_map;
+        return $this->map;
     }
 
     /**
@@ -84,7 +84,7 @@ class Canvas extends Widget
      */
     public function setMap(Map $map)
     {
-        $this->_map = $map;
+        $this->map = $map;
         $this->api->addObject($map, $map->id);
     }
 
@@ -95,6 +95,6 @@ class Canvas extends Widget
     {
         parent::run();
         $this->htmlOptions['id'] = $this->map->id;
-        echo Html::tag($this->tagName, '', $this->htmlOptions);
+        return Html::tag($this->tagName, '', $this->htmlOptions);
     }
 }

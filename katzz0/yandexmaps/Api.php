@@ -17,22 +17,43 @@ class Api extends Component
 {
     const SCRIPT_ID = 'yandex.maps.api';
 
-    /** @var string */
+    /** @var
+     * string
+     * */
     public $protocol = 'http';
 
-    /** @var string */
+    /**
+     * @var string
+     * */
     public $uri = 'api-maps.yandex.ru';
 
-    /** @var string */
+    /**
+     * @var string
+     * */
     public $api_version = '2.1';
 
-    /** @var string */
-    public $language = 'ru-RU';
-    /** @var array */
+    /**
+     * @var string
+     * */
+    public $language;
+
+    /**
+     * @var array
+     * */
     public $packages = ['package.full'];
 
-    /** @var array */
-    private $_objects = [];
+    /**
+     * @var array
+     * */
+    private $objects = [];
+
+    /**
+     * Initialisation params
+     */
+    public function init()
+    {
+        $this->language = $this->language ?: (\Yii::$app->language ?: 'en-US');
+    }
 
     /**
      * @param mixed $key
@@ -42,9 +63,9 @@ class Api extends Component
     public function addObject($object, $key = null)
     {
         if (null === $key) {
-            $this->_objects[] = $object;
+            $this->objects[] = $object;
         } else {
-            $this->_objects[$key] = $object;
+            $this->objects[$key] = $object;
         }
         return $this;
     }
@@ -58,50 +79,12 @@ class Api extends Component
         $this->registerScript();
     }
 
-    protected function encodeArray($array)
-    {
-        return count($array) > 0 ? Json::encode($array) : '{}';
-    }
-
     /**
-     * @todo Add another API params
-     * @see http://api.yandex.ru/maps/doc/jsapi/2.x/dg/concepts/load.xml
+     * Generate specified object
+     * @param mixed $object
+     * @param null $var
+     * @return string
      */
-    protected function registerScriptFile()
-    {
-        if ('https' !== $this->protocol) {
-            $this->protocol = 'http';
-        }
-
-        if (is_array($this->packages)) {
-            $this->packages = implode(',', $this->packages);
-        }
-
-        $url = $this->protocol .
-            '://' . $this->uri . '/' .
-            $this->api_version
-            . '/?lang=' . $this->language
-            . '&load=' . $this->packages;
-
-        \Yii::$app->view->registerJsFile($url, [], ['position' => View::POS_END]);
-    }
-
-    /**
-     * Register client script.
-     */
-    protected function registerScript()
-    {
-        $js = "\$Maps = [];\nymaps.ready(function() {\n";
-
-        foreach ($this->_objects as $var => $object) {
-            $js .= $this->generateObject($object, $var) . "\n";
-        }
-
-        $js .= "});\n";
-
-        \Yii::$app->view->registerJs($js, View::POS_READY, self::SCRIPT_ID);
-    }
-
     public function generateObject($object, $var = null)
     {
         $class = get_class($object);
@@ -130,8 +113,8 @@ class Api extends Component
 
     public function generateGeoObjectCollection(GeoObjectCollection $object, $var = null)
     {
-        $properties = $this->encodeArray($object->properties);
-        $options = $this->encodeArray($object->options);
+        $properties = Json::encode($object->properties);
+        $options = Json::encode($object->options);
 
         $js = "new ymaps.GeoObjectCollection($properties, $options)";
         if (null !== $var) {
@@ -151,11 +134,17 @@ class Api extends Component
         return $js;
     }
 
+    /**
+     * Generates map
+     * @param Map $map
+     * @param int $var
+     * @return string
+     */
     public function generateMap(Map $map, $var = null)
     {
         $id = $map->id;
-        $state = $this->encodeArray($map->state);
-        $options = $this->encodeArray($map->options);
+        $state = Json::encode($map->state);
+        $options = Json::encode($map->options);
 
         $js = "new ymaps.Map('$id', $state, $options)";
         if (null !== $var) {
@@ -190,7 +179,7 @@ class Api extends Component
                             $_object = $this->generateObject($object);
 
                             // use Clusterer
-                            if ($map->use_clusterer && $object instanceof objects\Placemark) {
+                            if ($map->useClusterer && $object instanceof objects\Placemark) {
                                 $clusterer .= "points[$i] = $_object;\n";
                             } else {
                                 $objects .= ".add($_object)\n";
@@ -202,7 +191,7 @@ class Api extends Component
                     }
                 }
 
-                if ($map->use_clusterer) {
+                if ($map->useClusterer) {
                     $js .= "$clusterer\nvar clusterer = new ymaps.Clusterer();clusterer.add(points);";
                     $objects .= ".add(clusterer)";
                 }
@@ -224,7 +213,7 @@ class Api extends Component
                 $controls = "\n\$Maps['$id'].controls";
                 foreach ($map->controls as $control) {
                     if (count($control) > 1) {
-                        $config = $this->encodeArray($control[1]);
+                        $config = Json::encode($control[1]);
                         $controls .= "\n\t.add($control[0], $config)";
                     } else {
                         $controls .= "\n\t.add($control[0])";
@@ -240,8 +229,8 @@ class Api extends Component
     public function generatePlacemark(objects\Placemark $object, $var = null)
     {
         $geometry = Json::encode($object->geometry);
-        $properties = $this->encodeArray($object->properties);
-        $options = $this->encodeArray($object->options);
+        $properties = Json::encode($object->properties);
+        $options = Json::encode($object->options);
 
         $js = "new ymaps.Placemark($geometry, $properties, $options)";
         if (null !== $var) {
@@ -254,8 +243,8 @@ class Api extends Component
     public function generatePolyline(objects\Polyline $object, $var = null)
     {
         $geometry = Json::encode($object->geometry);
-        $properties = $this->encodeArray($object->properties);
-        $options = $this->encodeArray($object->options);
+        $properties = Json::encode($object->properties);
+        $options = Json::encode($object->options);
 
         $js = "new ymaps.Polyline($geometry, $properties, $options)";
         if (null !== $var) {
@@ -268,8 +257,8 @@ class Api extends Component
     public function generatePolygon(objects\Polygon $object, $var = null)
     {
         $geometry = Json::encode($object->geometry);
-        $properties = $this->encodeArray($object->properties);
-        $options = $this->encodeArray($object->options);
+        $properties = Json::encode($object->properties);
+        $options = Json::encode($object->options);
 
         $js = "new ymaps.Polygon($geometry, $properties, $options)";
         if (null !== $var) {
@@ -287,5 +276,44 @@ class Api extends Component
         }
 
         return $js;
+    }
+
+    /**
+     * @todo Add another API params
+     * @see http://api.yandex.ru/maps/doc/jsapi/2.x/dg/concepts/load.xml
+     */
+    protected function registerScriptFile()
+    {
+        if ('https' !== $this->protocol) {
+            $this->protocol = 'http';
+        }
+
+        if (is_array($this->packages)) {
+            $this->packages = implode(',', $this->packages);
+        }
+
+        $url = $this->protocol .
+            '://' . $this->uri . '/' .
+            $this->api_version
+            . '/?lang=' . $this->language
+            . '&load=' . $this->packages;
+
+        \Yii::$app->view->registerJsFile($url, ['position' => View::POS_END]);
+    }
+
+    /**
+     * Register client script.
+     */
+    protected function registerScript()
+    {
+        $js = "\$Maps = [];\nymaps.ready(function() {\n";
+
+        foreach ($this->objects as $var => $object) {
+            $js .= $this->generateObject($object, $var) . "\n";
+        }
+
+        $js .= "});\n";
+
+        \Yii::$app->view->registerJs($js, View::POS_READY, self::SCRIPT_ID);
     }
 }
