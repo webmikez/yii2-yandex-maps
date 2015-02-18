@@ -43,23 +43,26 @@ Map instance.
 __Usage__
 
 ```php
-    $map = new Map('yandex_map', [
-            'center' => [55.7372, 37.6066],
-            'zoom' => 10,
-            // Enable zoom with mouse scroll
-            'behaviors' => array('default', 'scrollZoom'),
-            'type' => "yandex#map",
-        ], 
-        [
-            // Permit zoom only fro 9 to 11
-            'minZoom' => 9,
-            'maxZoom' => 11,
-            'controls' => [
-              "new ymaps.control.SmallZoomControl()",
-              "new ymaps.control.TypeSelector(['yandex#map', 'yandex#satellite'])",  
-            ],                    
-        ]                
-    );             
+
+use katzz0\yandexmaps\Map;
+
+$map = new Map('yandex_map', [
+        'center' => [55.7372, 37.6066],
+        'zoom' => 10,
+        // Enable zoom with mouse scroll
+        'behaviors' => array('default', 'scrollZoom'),
+        'type' => "yandex#map",
+    ],
+    [
+        // Permit zoom only fro 9 to 11
+        'minZoom' => 9,
+        'maxZoom' => 11,
+        'controls' => [
+          "new ymaps.control.SmallZoomControl()",
+          "new ymaps.control.TypeSelector(['yandex#map', 'yandex#satellite'])",
+        ],
+    ]
+);
 ```
 
 ### katzz0\yandexmaps\Canvas ###
@@ -73,12 +76,12 @@ Simple add widget to view:
 
 use katzz0\yandexmaps\Canvas as YandexMaps;
 
-echo Canvas::widget([
+<?=YandexMaps::widget([
         'htmlOptions' => [
             'style' => 'height: 400px;',
         ],
         'map' => $map,
-    ]);
+])?>
 ```
 
 ### katzz0\yandexmaps\Clusterer ###
