@@ -43,7 +43,6 @@ Map instance.
 __Usage__
 
 ```php
-
 use katzz0\yandexmaps\Map;
 
 $map = new Map('yandex_map', [
@@ -73,7 +72,6 @@ __Usage__
 
 Simple add widget to view:
 ```php
-
 use katzz0\yandexmaps\Canvas as YandexMaps;
 
 <?=YandexMaps::widget([
