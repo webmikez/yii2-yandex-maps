@@ -2,21 +2,26 @@
 
 * * *
 
+This repo is fork of the [yii2-yandex-maps](https://github.com/Mirocow/yii2-yandex-maps "yii2-yandex-maps")
+of [Mirocow](https://github.com/Mirocow "Mirocow")
+
+* * *
+
 ## Components ##
 
-- [`mirocow\yandexmaps\Api`](https://github.com/mirocow/yii2-yandex-maps#mirocowyandexmapsapi)
-- [`mirocow\yandexmaps\Map`](https://github.com/mirocow/yii2-yandex-maps#mirocowyandexmapsmap)
-- [`mirocow\yandexmaps\Canvas`](https://github.com/mirocow/yii2-yandex-maps#mirocowyandexmapscanvas)
-- `mirocow\yandexmaps\JavaScript`
-- `mirocow\yandexmaps\Placemark`
-- `mirocow\yandexmaps\Polyline`
-- TODO: [Geo XML](http://api.yandex.ru/maps/doc/jsapi/2.x/dg/concepts/geoxml.xml)
-- TODO: [GeoObject](http://api.yandex.ru/maps/doc/jsapi/2.x-stable/ref/reference/GeoObject.xml)
-- TODO: [Balloon](http://api.yandex.ru/maps/doc/jsapi/2.x-stable/ref/reference/Balloon.xml)
-- TODO: [Hint](http://api.yandex.ru/maps/doc/jsapi/2.x-stable/ref/reference/Hint.xml)
-- TODO: [Clusterer](http://api.yandex.ru/maps/doc/jsapi/2.x/ref/reference/Clusterer.xml)
+- [`katzz0\yandexmaps\Api`](https://github.com/katzz0/yii2-yandex-maps#katzz0yandexmapsapi)
+- [`katzz0\yandexmaps\Map`](https://github.com/katzz0/yii2-yandex-maps#katzz0yandexmapsmap)
+- [`katzz0\yandexmaps\Canvas`](https://github.com/katzz0/yii2-yandex-maps#katzz0yandexmapscanvas)
+- `katzz0\yandexmaps\JavaScript`
+- `katzz0\yandexmaps\Placemark`
+- `katzz0\yandexmaps\Polyline`
+- TODO: [Geo XML](http://api.yandex.ru/maps/doc/jsapi/2.1/dg/concepts/geoxml.xml)
+- TODO: [GeoObject](http://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/GeoObject.xml)
+- TODO: [Balloon](http://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/Balloon.xml)
+- TODO: [Hint](http://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/Hint.xml)
+- TODO: [Clusterer](http://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/Clusterer.xml)
 
-### mirocow\yandexmaps\Api ###
+### katzz0\yandexmaps\Api ###
 
 Application components which register scripts.
 
@@ -31,14 +36,14 @@ Attach component to application (e.g. edit config/main.php):
  ],
 ```
 
-### mirocow\yandexmaps\Map ###
+### katzz0\yandexmaps\Map ###
 
 Map instance.
 
 __Usage__
 
 ```php
-    $map = new YandexMap('yandex_map', [
+    $map = new Map('yandex_map', [
             'center' => [55.7372, 37.6066],
             'zoom' => 10,
             // Enable zoom with mouse scroll
@@ -57,7 +62,7 @@ __Usage__
     );             
 ```
 
-### mirocow\yandexmaps\Canvas ###
+### katzz0\yandexmaps\Canvas ###
 
 This is widget which render html tag for your map.
 
@@ -66,9 +71,9 @@ __Usage__
 Simple add widget to view:
 ```php
 
-use mirocow\yandexmaps\Canvas as YandexMaps;
+use katzz0\yandexmaps\Canvas as YandexMaps;
 
-echo YandexCanvas::widget([
+echo Canvas::widget([
         'htmlOptions' => [
             'style' => 'height: 400px;',
         ],
@@ -76,7 +81,7 @@ echo YandexCanvas::widget([
     ]);
 ```
 
-### mirocow\yandexmaps\Clusterer ###
+### katzz0\yandexmaps\Clusterer ###
 
 ```js
     for (var i in map_point) {

@@ -18,11 +18,12 @@
     ],
 	"minimum-stability": "dev",
     "require": {
-        "yiisoft/yii2": "*"
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "2.0.2"
     },
     "autoload": {
         "psr-0": {
-            "mirocow\\yandexmaps\\": ""
+            "katzz0\\yandexmaps\\": ""
         }
     }
 }
