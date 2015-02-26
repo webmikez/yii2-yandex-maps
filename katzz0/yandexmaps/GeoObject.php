@@ -1,5 +1,4 @@
 <?php
-
 namespace katzz0\yandexmaps;
 
 use katzz0\yandexmaps\Interfaces;
@@ -15,26 +14,41 @@ use yii\base\Exception;
  */
 class GeoObject extends JavaScript implements Interfaces\GeoObject, Interfaces\EventAggregate
 {
-    /** @var array */
-    private $_feature;
-    /** @var array */
-    private $_options = [];
-
-    /** @var array */
-    private $_events = [];
+    /**
+     * @var Geometry Position of the object
+     */
+    private $geometry;
 
     /**
-     * @param array $feature
-     * @param array $options
+     * @var array
      */
-    public function __construct(array $feature, array $options = array())
+    private $properties = [];
+
+    /**
+     * @var array
+     */
+    private $options = [];
+
+    /**
+     * @var array
+     */
+    private $events = [];
+
+    /**
+     * Constructor
+     * @param Geometry $geometry
+     * @param array
+     * @param array $options$properties
+     */
+    public function __construct(Geometry $geometry, array $properties = [], array $options = [])
     {
         if (isset($options['events'])) {
             $this->setEvents($options['events']);
             unset($options['events']);
         }
 
-        $this->setFeature($feature);
+        $this->setGeometry($geometry);
+        $this->setProperties($properties);
         $this->setOptions($options);
     }
 
@@ -52,7 +66,7 @@ class GeoObject extends JavaScript implements Interfaces\GeoObject, Interfaces\E
      */
     public function setEvents(array $events)
     {
-        $this->_events = $events;
+        $this->events = $events;
     }
 
     /**
@@ -60,27 +74,7 @@ class GeoObject extends JavaScript implements Interfaces\GeoObject, Interfaces\E
      */
     public function getEvents()
     {
-        return $this->_events;
-    }
-
-    /**
-     * @return array
-     * @throws Exception
-     */
-    public function getFeature()
-    {
-        if (empty($this->_feature)) {
-            throw new Exception('Empty placemark geometry.');
-        }
-        return $this->_feature;
-    }
-
-    /**
-     * @param array $feature
-     */
-    public function setFeature(array $feature)
-    {
-        $this->_feature = $feature;
+        return $this->events;
     }
 
     /**
@@ -88,7 +82,7 @@ class GeoObject extends JavaScript implements Interfaces\GeoObject, Interfaces\E
      */
     public function getOptions()
     {
-        return $this->_options;
+        return $this->options;
     }
 
     /**
@@ -96,23 +90,23 @@ class GeoObject extends JavaScript implements Interfaces\GeoObject, Interfaces\E
      */
     public function setOptions(array $options)
     {
-        $this->_options = $options;
+        $this->options = $options;
     }
 
     /**
-     * @return array
+     * @return Geometry
      */
     public function getGeometry()
     {
-        return isset($this->_feature['geometry']) ? $this->_feature['geometry'] : [];
+        return $this->geometry;
     }
 
     /**
-     * @param array $geometry
+     * @param Point|string $geometry
      */
-    public function setGeometry(array $geometry)
+    public function setGeometry($geometry)
     {
-        $this->_feature['coordinates'] = $geometry;
+        $this->geometry = $geometry;
     }
 
     /**
@@ -120,7 +114,7 @@ class GeoObject extends JavaScript implements Interfaces\GeoObject, Interfaces\E
      */
     public function getProperties()
     {
-        return isset($this->_feature['properties']) ? $this->_feature['properties'] : [];
+        return $this->properties;
     }
 
     /**
@@ -128,6 +122,6 @@ class GeoObject extends JavaScript implements Interfaces\GeoObject, Interfaces\E
      */
     public function setProperties(array $properties)
     {
-        $this->_feature['properties'] = $properties;
+        $this->properties = $properties;
     }
 }

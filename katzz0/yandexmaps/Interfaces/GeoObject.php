@@ -1,27 +1,13 @@
 <?php
 namespace katzz0\yandexmaps\Interfaces;
 
+use katzz0\yandexmaps\objects\Point;
+
 /**
  * interface GeoObject
  */
 interface GeoObject
 {
-    /**
-     * @param array $feature
-     * @param array $options
-     */
-    public function __construct(array $feature, array $options = []);
-
-    /**
-     * @return array
-     */
-    public function getFeature();
-
-    /**
-     * @param array $feature
-     */
-    public function setFeature(array $feature);
-
     /**
      * @return array
      */
@@ -38,9 +24,9 @@ interface GeoObject
     public function getGeometry();
 
     /**
-     * @param array $geometry
+     * @param Point|array|string $geometry
      */
-    public function setGeometry(array $geometry);
+    public function setGeometry($geometry);
 
     /**
      * @return array

@@ -1,6 +1,8 @@
 <?php
 namespace katzz0\yandexmaps\Interfaces;
 
+use katzz0\yandexmaps\JavaScript;
+
 /**
  * interface GeoObject
  */
@@ -17,7 +19,7 @@ interface GeoObjectCollection
     public function setObjects(array $objects = []);
 
     /**
-     * @param mixed $object
+     * @param JavaScript $object
      */
-    public function addObject($object);
+    public function addObject(JavaScript $object);
 }

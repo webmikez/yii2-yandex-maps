@@ -10,8 +10,10 @@ use yii\base\Component;
  */
 class JavaScript extends Component
 {
-    /** @var string */
-    private $_code = '';
+    /**
+     * @var string
+     */
+    private $code;
 
     /**
      * @param string $code
@@ -22,19 +24,12 @@ class JavaScript extends Component
     }
 
     /**
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->getCode();
-    }
-
-    /**
+     * Returns the JS code
      * @return string
      */
     public function getCode()
     {
-        return $this->_code;
+        return $this->code;
     }
 
     /**
@@ -42,6 +37,30 @@ class JavaScript extends Component
      */
     public function setCode($code)
     {
-        $this->_code = (string)$code;
+        $this->code = (string) $code;
+    }
+
+    /**
+     * Returns the JS variable name for this class
+     * @return string
+     */
+    public function getVarName()
+    {
+        return lcfirst(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
+    }
+
+    /**
+     * Returns the JS code
+     * @return string
+     */
+    function __toString()
+    {
+        try {
+            $code = $this->getCode();
+            return $code ?: '';
+        } catch (\Exception $e) {
+            \Yii::error($e->getMessage());
+            return '';
+        }
     }
 }

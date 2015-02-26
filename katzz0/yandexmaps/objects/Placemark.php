@@ -1,7 +1,10 @@
 <?php
 namespace katzz0\yandexmaps\objects;
 
+use katzz0\yandexmaps\Geometry;
 use katzz0\yandexmaps\GeoObject;
+use katzz0\yandexmaps\Point;
+use yii\helpers\Json;
 
 /**
  * Class Placemark
@@ -9,31 +12,25 @@ use katzz0\yandexmaps\GeoObject;
 class Placemark extends GeoObject
 {
     /**
-     * @param array $geometry
+     * @param Point|string $point Point or name of the place. If null, then placemark will be at the map center
      * @param array $properties
      * @param array $options
      */
-    public function __construct(array $geometry, array $properties = [], array $options = [])
+    public function __construct(Point $point = null, array $properties = [], array $options = [])
     {
-        $feature = [
-            'geometry' => [
-                'type' => "Point",
-                'coordinates' => $geometry,
-            ],
-            'properties' => $properties,
-        ];
-        parent::__construct($feature, $options);
+        $geometry = new Geometry(Geometry::TYPE_POINT, [$point]);
+        parent::__construct($geometry, $properties, $options);
     }
 
     /**
-     * @return array
+     * @inheritdoc
      */
-    public function getGeometry()
+    public function getCode()
     {
-        $geometry = parent::getGeometry();
-        if (isset($geometry['coordinates'])) {
-            $geometry = $geometry['coordinates'];
-        }
-        return $geometry;
+        $geometry = $this->getGeometry()->getJson();
+        $properties = Json::encode($this->getProperties());
+        $options = Json::encode($this->getOptions());
+
+        return "new ymaps.Placemark($geometry, $properties, $options)";
     }
 }

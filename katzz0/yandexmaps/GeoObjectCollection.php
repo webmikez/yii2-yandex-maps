@@ -2,6 +2,7 @@
 namespace katzz0\yandexmaps;
 
 use katzz0\yandexmaps\Interfaces;
+use yii\helpers\Json;
 
 /**
  * Class GeoObjectsCollection
@@ -15,14 +16,14 @@ class GeoObjectCollection extends GeoObject implements Interfaces\GeoObjectColle
     /**
      * @var array
      */
-    private $_objects = [];
+    private $objects = [];
 
     /**
      * @return array
      */
     public function getObjects()
     {
-        return $this->_objects;
+        return $this->objects;
     }
 
     /**
@@ -37,10 +38,21 @@ class GeoObjectCollection extends GeoObject implements Interfaces\GeoObjectColle
     }
 
     /**
-     * @param Interfaces\GeoObject $object
+     * @param JavaScript $object
      */
-    public function addObject($object)
+    public function addObject(JavaScript $object)
     {
-        $this->_objects[] = $object;
+        $this->objects[] = $object;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCode()
+    {
+        $properties = Json::encode($this->getProperties());
+        $options = Json::encode($this->getOptions());
+
+        return "new ymaps.GeoObjectCollection($properties, $options)";
     }
 }

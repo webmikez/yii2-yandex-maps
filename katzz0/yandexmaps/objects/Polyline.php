@@ -1,7 +1,9 @@
 <?php
 namespace katzz0\yandexmaps\objects;
 
+use katzz0\yandexmaps\Geometry;
 use katzz0\yandexmaps\GeoObject;
+use yii\helpers\Json;
 
 /**
  * Class Polyline
@@ -9,20 +11,14 @@ use katzz0\yandexmaps\GeoObject;
 class Polyline extends GeoObject
 {
     /**
-     * @param array $geometry
+     * @param array $points
      * @param array $properties
      * @param array $options
      */
-    public function __construct(array $geometry, array $properties = [], array $options = [])
+    public function __construct(array $points, array $properties = [], array $options = [])
     {
-        $feature = [
-            'geometry' => [
-                'type' => "LineString",
-                'coordinates' => $geometry,
-            ],
-            'properties' => $properties,
-        ];
-        parent::__construct($feature, $options);
+        $geometry = new Geometry(Geometry::TYPE_LINE, $points);
+        parent::__construct($geometry, $options);
     }
 
     /**
@@ -35,5 +31,17 @@ class Polyline extends GeoObject
             $geometry = $geometry['coordinates'];
         }
         return $geometry;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCode()
+    {
+        $geometry = Json::encode($this->getGeometry());
+        $properties = Json::encode($this->getProperties());
+        $options = Json::encode($this->getOptions());
+
+        return "new ymaps.Polyline($geometry, $properties, $options)";
     }
 }

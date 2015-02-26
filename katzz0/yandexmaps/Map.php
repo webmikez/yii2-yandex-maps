@@ -2,6 +2,7 @@
 namespace katzz0\yandexmaps;
 
 use yii\base\Exception;
+use yii\helpers\Json;
 use katzz0\yandexmaps\Interfaces\GeoObjectCollection;
 use katzz0\yandexmaps\Interfaces\EventAggregate;
 
@@ -33,6 +34,11 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
     const BEHAVIOR_ROUTE_EDITOR = 'routeEditor';
 
     /**
+     * @var int Widgets counter
+     */
+    public static $counter = 0;
+
+    /**
      * @var array Map state options
      */
     public $state = [];
@@ -43,22 +49,17 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
     public $options = [];
 
     /**
-     * @var bool Использовать ли кластеризатор
-     */
-    public $useClusterer = false;
-
-    /**
      * @var string
      */
     private $id;
 
     /**
-     * @var array
+     * @var JavaScript[] Objects in the map
      */
     private $objects = [];
 
     /**
-     * @var array Control item in the map
+     * @var JavaScript[] Control item in the map
      */
     private $controls = [];
 
@@ -72,8 +73,10 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
      * @param array $state
      * @param array $options
      */
-    public function __construct($id = 'myMap', array $state = [], array $options = [])
+    public function __construct($id = null, array $state = [], array $options = [])
     {
+        $id = $id ?: self::$counter++;
+
         $this->setId($id);
         $this->state = $state;
         if (isset($options['controls'])) {
@@ -110,13 +113,9 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
 
     /**
      * @return string
-     * @throws Exception
      */
     public function getId()
     {
-        if (empty($this->id)) {
-            throw new Exception('Empty map ID.');
-        }
         return $this->id;
     }
 
@@ -125,7 +124,16 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
      */
     public function setId($id)
     {
-        $this->id = (string)$id;
+        $this->id = $id;
+    }
+
+    /**
+     * Returns the JS id
+     * @return string
+     */
+    public function getJsId()
+    {
+        return 'map_' . $this->id;
     }
 
     /**
@@ -164,10 +172,10 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
     }
 
     /**
-     * @param mixed $object
+     * @param JavaScript $object
      * @return Map
      */
-    public function addObject($object)
+    public function addObject(JavaScript $object)
     {
         $this->objects[] = $object;
         return $this;
@@ -195,10 +203,10 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
     /**
      * The control.
      * ```php
-     * $map->addControl(array('zoomControl', array(
+     * $map->addControl(['zoomControl', [
      *    'left' => '5px',
      *    'top' => '5px',
-     * )));
+     * ]]);
      * ```
      * @param mixed $control
      * @return $this
@@ -214,5 +222,100 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
         }
         $this->controls[$control[0]] = $control;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCode()
+    {
+        $state = Json::encode($this->state);
+        $options = Json::encode($this->options);
+
+        $js = ["{$this->getJsId()} = new ymaps.Map('{$this->id}', $state, $options)"];
+
+        if (count($this->objects) > 0) {
+            $js[] = $this->makeObjectsScript();
+        }
+        if (count($this->controls) > 0) {
+            $js[] = $this->makeControlsScript();
+        }
+
+        $js = implode(";\n", $js);
+        if (isset($this->state['center']) && is_string($this->state['center'])) {
+            $js = (string) new GeoCoder($this->state['center'], $js);
+        }
+
+        return $js;
+    }
+
+    /**
+     * Generates JS script lines for map objects
+     * @return string
+     */
+    private function makeObjectsScript()
+    {
+        $js = [];
+        $geoObjects = [];
+
+        $varCounter = 0;
+        foreach ($this->objects as $i => $object) {
+            if ($object instanceof GeoObject) {
+                $var = $object->getVarName() . $varCounter++;
+
+                $js[] = 'var ' . $var . ' = ' . (string) $object;
+                $js[] = $this->makeBindEventsScript($var, $object);
+
+                $geoObjects[] = ".add($var)";
+            } else {
+                $js[] = (string) $object;
+            }
+        }
+
+        if (!empty($geoObjects)) {
+            $js[] = "{$this->getJsId()}.geoObjects" . implode($geoObjects) . ';';
+        }
+
+        return implode(";\n\t", $js);
+    }
+
+    /**
+     * Generates JS script lines for map controls
+     * @return string[]
+     */
+    private function makeControlsScript()
+    {
+        $controls[] = "{$this->getJsId()}.controls";
+
+        foreach ($this->controls as $control) {
+            if (count($control) > 1) {
+                $config = Json::encode($control[1]);
+                $controls[] = ".add($control[0], $config)";
+            } else {
+                $controls[] = ".add($control[0])";
+            }
+        }
+
+        return implode('', $controls);
+    }
+
+    /**
+     * Bind event to the item
+     */
+    private function makeBindEventsScript($var, GeoObject $object)
+    {
+        $events = ["$var.events"];
+
+        foreach ($object->getEvents() as $event => $handle) {
+            $event = Json::encode($event);
+            if (is_string($handle) && strpos($handle, 'js:') === 0) {
+                $handle = substr($handle, 3);
+            } else {
+                $handle = Json::encode($handle);
+            }
+            $events[] = ".add($event, $handle)";
+        }
+
+        return implode($events);
     }
 }

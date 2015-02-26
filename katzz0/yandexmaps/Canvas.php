@@ -1,11 +1,10 @@
 <?php
 namespace katzz0\yandexmaps;
 
-use yii\base\Exception;
+use yii\base\InvalidParamException;
 use yii\base\Widget;
 use yii\helpers\Html;
-use yii\base\Event;
-use yii\base\View;
+use yii\web\View;
 
 /**
  * Class Canvas
@@ -15,12 +14,10 @@ use yii\base\View;
  */
 class Canvas extends Widget
 {
-    const EVENT_AFTER_RENDER = 'afterRender';
-
     /**
-     * @var string
+     * @var Map Current Map object
      */
-    public static $componentId = 'yandexMapsApi';
+    public $map;
 
     /**
      * @var string
@@ -36,65 +33,36 @@ class Canvas extends Widget
     ];
 
     /**
-     * @var Map Current Map object
-     */
-    private $map;
-
-    /**
-     * @var bool Is already rendered map
-     */
-    private $isRendered = false;
-
-    /**
-     * @return Api
-     */
-    public function getApi()
-    {
-        return \Yii::$app->get(self::$componentId);
-    }
-
-    /**
      * @inheritdoc
      */
     public function init()
     {
-        Event::on(View::className(), View::EVENT_AFTER_RENDER, function ($event) {
-            if (!$this->isRendered) {
-                \Yii::$app->get('yandexMapsApi')->render();
-                $this->isRendered = true;
-            }
-        });
-    }
+        parent::init();
 
-    /**
-     * Returns the Map object
-     * @return Map
-     * @throws Exception
-     */
-    public function getMap()
-    {
-        if (null === $this->map) {
-            throw new Exception('Orphan map canvas.');
+        if (!($this->map instanceof Map)) {
+            throw new InvalidParamException('Param map is not set');
         }
-        return $this->map;
     }
 
     /**
-     * @param Map $map
-     */
-    public function setMap(Map $map)
-    {
-        $this->map = $map;
-        $this->api->addObject($map, $map->id);
-    }
-
-    /**
-     * Run widget.
+     * Run widget
      */
     public function run()
     {
-        parent::run();
+        $this->registerScripts();
+
         $this->htmlOptions['id'] = $this->map->id;
         return Html::tag($this->tagName, '', $this->htmlOptions);
+    }
+
+    /**
+     * Register scripts for map control
+     */
+    private function registerScripts()
+    {
+        Api::registerApiFile($this->map);
+
+        $js = "\nymaps.ready(function() {\n" .(string) $this->map ."\n});";
+        \Yii::$app->view->registerJs($js, View::POS_READY);
     }
 }

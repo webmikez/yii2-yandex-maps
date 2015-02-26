@@ -74,38 +74,56 @@ Simple add widget to view:
 ```php
 use katzz0\yandexmaps\Canvas as YandexMaps;
 
-<?=YandexMaps::widget([
-        'htmlOptions' => [
-            'style' => 'height: 400px;',
-        ],
-        'map' => $map,
-])?>
+<?= YandexMaps::widget([
+    'htmlOptions' => [
+        'style' => 'height: 600px;',
+    ],
+    'map' => new Map('yandex_map', [
+        'center' => [55.7372, 37.6066],
+        'zoom' => 17,
+        'controls' => [Map::CONTROL_ZOOM],
+        'behaviors' => [Map::BEHAVIOR_DRAG],
+        'type' => "yandex#map",
+    ],
+    [
+        'objects' => [new Placemark(new Point(55.7372, 37.6066), [], [
+            'draggable' => true,
+            'preset' => 'islands#dotIcon',
+            'iconColor' => '#2E9BB9',
+            'events' => [
+                'dragend' => 'js:function (e) {
+                    console.log(e.get(\'target\').geometry.getCoordinates());
+                    }'
+            ]
+        ])]
+    ])
+]) ?>
+
 ```
 
-### katzz0\yandexmaps\Clusterer ###
+You can use also direct place label:
 
-```js
-    for (var i in map_point) {
-    points[i] = new ymaps.GeoObject({
-     geometry : {
-      type: 'Point',
-      coordinates : [map_point[i]['lat'],map_point[i]['lng']]
-     },
-     properties : {
-      balloonContentBody : map_point[i]['body']
-      // hintContent : 'подробнее'
-     }
-    },
-    {
-     iconImageHref: '/i/' + map_point[i]['spec']+'.png',
-     iconImageSize: [29,29],
-     balloonIconImageHref: '/i/' + map_point[i]['spec']+'.png',
-     balloonIconImageSize: [29,29],
-     hasBalloon: true
-    });
-   }
-
-   var clusterer = new ymaps.Clusterer();
-   clusterer.add(points);
-   map.geoObjects.add(clusterer);
-```
+<?= YandexMaps::widget([
+    'htmlOptions' => [
+        'style' => 'height: 600px;',
+    ],
+    'map' => new Map(null, [
+        'center' => 'London',
+        'zoom' => 17,
+        'controls' => [Map::CONTROL_ZOOM],
+        'behaviors' => [Map::BEHAVIOR_DRAG],
+        'type' => "yandex#map",
+    ],
+    [
+        'objects' => [new Placemark(null, [], [
+            'draggable' => true,
+            'preset' => 'islands#dotIcon',
+            'iconColor' => '#2E9BB9',
+            'events' => [
+                'dragend' => 'js:function (e) {
+                    console.log(e.get(\'target\').geometry.getCoordinates());
+                    }'
+            ]
+        ])]
+    ])
+]) ?>
