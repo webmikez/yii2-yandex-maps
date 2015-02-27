@@ -128,15 +128,6 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
     }
 
     /**
-     * Returns the JS id
-     * @return string
-     */
-    public function getJsId()
-    {
-        return 'map_' . $this->id;
-    }
-
-    /**
      * @param array $events
      */
     public function setEvents(array $events)
@@ -232,7 +223,7 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
         $state = Json::encode($this->state);
         $options = Json::encode($this->options);
 
-        $js = ["{$this->getJsId()} = new ymaps.Map('{$this->id}', $state, $options)"];
+        $js = ["{$this->getId()} = new ymaps.Map('{$this->id}', $state, $options)"];
 
         if (count($this->objects) > 0) {
             $js[] = $this->makeObjectsScript();
@@ -273,7 +264,7 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
         }
 
         if (!empty($geoObjects)) {
-            $js[] = "{$this->getJsId()}.geoObjects" . implode($geoObjects) . ';';
+            $js[] = "{$this->getId()}.geoObjects" . implode($geoObjects) . ';';
         }
 
         return implode(";\n\t", $js);
@@ -285,7 +276,7 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
      */
     private function makeControlsScript()
     {
-        $controls[] = "{$this->getJsId()}.controls";
+        $controls[] = "{$this->getId()}.controls";
 
         foreach ($this->controls as $control) {
             if (count($control) > 1) {

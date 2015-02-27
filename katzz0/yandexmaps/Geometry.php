@@ -80,7 +80,7 @@ class Geometry extends Component
         ];
 
         if (!count($this->points) && $map = Api::getCurrentMap()) {
-            $data['coordinates'] = new JsExpression($map->getJsId().'.getCenter()');
+            $data['coordinates'] = new JsExpression($map->getId().'.getCenter()');
         } elseif (count($this->points) === 1) {
             $data['coordinates'] = $this->points[0]->getCoordinates();
         } else {

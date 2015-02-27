@@ -93,7 +93,7 @@ use katzz0\yandexmaps\Canvas as YandexMaps;
             'events' => [
                 'dragend' => 'js:function (e) {
                     console.log(e.get(\'target\').geometry.getCoordinates());
-                    }'
+                }'
             ]
         ])]
     ])
@@ -102,7 +102,7 @@ use katzz0\yandexmaps\Canvas as YandexMaps;
 ```
 
 You can use also direct place label:
-
+```php
 <?= YandexMaps::widget([
     'htmlOptions' => [
         'style' => 'height: 600px;',
@@ -127,3 +127,5 @@ You can use also direct place label:
         ])]
     ])
 ]) ?>
+
+```
