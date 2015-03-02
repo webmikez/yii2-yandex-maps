@@ -255,7 +255,9 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
                 $var = $object->getVarName() . $varCounter++;
 
                 $js[] = 'var ' . $var . ' = ' . (string) $object;
-                $js[] = $this->makeBindEventsScript($var, $object);
+                if ($events = $this->makeBindEventsScript($var, $object)) {
+                    $js[] = $events;
+                }
 
                 $geoObjects[] = ".add($var)";
             } else {
@@ -295,6 +297,10 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
      */
     private function makeBindEventsScript($var, GeoObject $object)
     {
+        if (!count($object->getEvents())) {
+            return null;
+        }
+
         $events = ["$var.events"];
 
         foreach ($object->getEvents() as $event => $handle) {
