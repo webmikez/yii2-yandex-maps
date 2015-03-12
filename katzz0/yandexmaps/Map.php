@@ -234,7 +234,7 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
 
         $js = implode(";\n", $js);
         if (isset($this->state['center']) && is_string($this->state['center'])) {
-            $js = (string) new GeoCoder($this->state['center'], $js);
+            $js = (string) new JsGeoCoderWrapper($this->state['center'], $js);
         }
 
         return $js;

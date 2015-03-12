@@ -1,37 +1,101 @@
 <?php
+
 namespace katzz0\yandexmaps;
 
+use yii\base\Component;
+use yii\base\InvalidConfigException;
+
 /**
- * Class Geocoder
+ * Class GeoCoder
  *
- * Geocoder wrapper
+ * Component for geocoding by http request
  */
-class GeoCoder extends JavaScript
+class GeoCoder extends Component
 {
     /**
-     * @var int Counter
+     * @var string Protocol for the requests, if not specified the detected
+     * by \Yii::$app->getRequest()->isSecureConnection
      */
-    static private $counter = 0;
+    public static $protocol;
 
     /**
-     * @var string Name of the place
+     * @var string Uri for the http geocode api
      */
-    private $place;
+    public static $uri = 'geocode-maps.yandex.ru';
 
     /**
-     * @inheritdoc
+     * @var string Version of the api
      */
-    public function __construct($place, $code)
+    public static $version = '1.x';
+
+    /**
+     * @var array curl params
+     */
+    protected static $CURL_OPTS = [
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 60,
+        CURLOPT_USERAGENT => 'yii2-yandex-maps'
+    ];
+
+    /**
+     * Find coordinates of the first matched object
+     * @param string $objectName
+     * @param array $params Different params for the request
+     * @return array|null
+     */
+    public static function findFirst($objectName, array $params = [])
     {
-        $this->place = $place;
+        $params['geocode'] = $objectName;
+        $result = self::makeRequest($params);
 
-        $pointVarName = 'point' . self::$counter++;
+        if (isset($result['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'])) {
+            return explode(
+                ' ',
+                $result['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos']
+            );
+        }
 
-        $js = "var $pointVarName = res.geoObjects.get(0).geometry.getCoordinates();\n";
-        $js .= preg_replace("/('|\"){$this->place}('|\")/", $pointVarName, $code);
+        return null;
+    }
 
-        $code = "ymaps.geocode(\"{$this->place}\", {result : 1}).then(function (res) {\n$js\n});";
+    /**
+     * Returns the template url for different requests
+     * @return string
+     */
+    private static function prepareRequestUrl()
+    {
+        $protocol = self::$protocol ?: (\Yii::$app->getRequest()->isSecureConnection ? 'https' : 'http');
+        return $protocol.'://'.self::$uri.'/'.self::$version.'/?';
+    }
 
-        parent::__construct($code);
+    /**
+     * Make request to the geocoder api
+     * @param array $params
+     * @return array|null
+     * @throws InvalidConfigException
+     */
+    private static function makeRequest(array $params)
+    {
+        if (!function_exists('curl_version')) {
+            throw new InvalidConfigException('Extension curl not found');
+        }
+
+        $ch = curl_init();
+
+        $params['format'] = 'json';
+
+        $opts = self::$CURL_OPTS;
+        $opts[CURLOPT_POSTFIELDS] = http_build_query($params, null, '&', PHP_QUERY_RFC1738);
+        $opts[CURLOPT_URL] = self::prepareRequestUrl();
+        curl_setopt_array($ch, $opts);
+
+        $result = curl_exec($ch);
+
+        if (curl_errno($ch) !== 0) {
+            return null;
+        }
+
+        return json_decode($result, true);
     }
 }
