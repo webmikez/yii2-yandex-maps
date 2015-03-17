@@ -28,7 +28,7 @@ class Placemark extends GeoObject
     public function getCode()
     {
         $geometry = $this->getGeometry()->getJson();
-        $properties = Json::encode($this->getProperties());
+        $properties = Json::encode($this->getProperties(), 0);
         $options = Json::encode($this->getOptions());
 
         return "new ymaps.Placemark($geometry, $properties, $options)";
