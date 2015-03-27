@@ -1,6 +1,8 @@
 <?php
 namespace katzz0\yandexmaps;
 
+use yii\helpers\Json;
+
 /**
  * Class Geocoder
  *
@@ -26,11 +28,11 @@ class JsGeoCoderWrapper extends JavaScript
         $this->place = $place;
 
         $pointVarName = 'point' . self::$counter++;
-
         $js = "var $pointVarName = res.geoObjects.get(0).geometry.getCoordinates();\n";
-        $js .= preg_replace("/('|\"){$this->place}('|\")/", $pointVarName, $code);
+        $js .= str_replace(Json::encode($this->place), $pointVarName, $code);
 
-        $code = "ymaps.geocode(\"{$this->place}\", {result : 1}).then(function (res) {\n$js\n});";
+        $encodedPlace = str_replace('"', '\\"', $this->place);
+        $code = "ymaps.geocode(\"{$encodedPlace}\", {result : 1}).then(function (res) {\n$js\n});";
 
         parent::__construct($code);
     }
