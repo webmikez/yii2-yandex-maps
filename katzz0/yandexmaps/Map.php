@@ -231,6 +231,9 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
         if (count($this->controls) > 0) {
             $js[] = $this->makeControlsScript();
         }
+        if (count($this->events) > 0) {
+            $js[] = $this->makeEventsScript();
+        }
 
         $js = implode(";\n", $js);
         if (isset($this->state['center']) && is_string($this->state['center'])) {
@@ -267,6 +270,27 @@ class Map extends JavaScript implements GeoObjectCollection, EventAggregate
 
         if (!empty($geoObjects)) {
             $js[] = "{$this->getId()}.geoObjects" . implode($geoObjects) . ';';
+        }
+
+        return implode(";\n\t", $js);
+    }
+
+    /**
+     * Generates JS script lines for map events
+     * @return string
+     */
+    private function makeEventsScript()
+    {
+        $js = [];
+
+        foreach ($this->getEvents() as $event => $handle) {
+            $event = Json::encode($event);
+            if (is_string($handle) && strpos($handle, 'js:') === 0) {
+                $handle = substr($handle, 3);
+            } else {
+                $handle = Json::encode($handle);
+            }
+            $js[] = "{$this->getId()}.events.add($event, $handle)";
         }
 
         return implode(";\n\t", $js);
