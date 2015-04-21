@@ -1,5 +1,5 @@
 <?php
-namespace katzz0\yandexmaps\Interfaces;
+namespace webmikez\yandexmaps\Interfaces;
 
 /**
  * interface EventAggregate

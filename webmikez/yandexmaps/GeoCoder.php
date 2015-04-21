@@ -1,6 +1,6 @@
 <?php
 
-namespace katzz0\yandexmaps;
+namespace webmikez\yandexmaps;
 
 use yii\base\Component;
 use yii\base\InvalidConfigException;

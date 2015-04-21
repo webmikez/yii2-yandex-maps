@@ -1,7 +1,7 @@
 <?php
-namespace katzz0\yandexmaps;
+namespace webmikez\yandexmaps;
 
-use katzz0\yandexmaps\Interfaces;
+use webmikez\yandexmaps\Interfaces;
 use yii\base\Exception;
 
 /**
