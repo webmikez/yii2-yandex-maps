@@ -1,19 +1,16 @@
 {
-    "name": "katzz0/yii2-yandex-maps",
+    "name": "webmikez/yii2-yandex-maps",
     "description": "Yii 2 yandex map module",
     "keywords": ["yii", "yii2", "map", "yandex"],
     "type": "yii2-extension",
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/katzz0/yii2-yandex-maps/issues?state=open",
-        "wiki": "https://github.com/katzz0/yii2-yandex-maps",
-        "source": "https://github.com/katzz0/yii2-yandex-maps"
+        "source": "https://github.com/webmikez/yii2-yandex-maps"
     },	
     "authors": [
         {
-            "name": "Maxim Palenov",
-            "email": "MAX_ELEK@mail.ru",
-            "homepage": "https://www.facebook.com/maxim.palenov"
+            "name": "webmikez",
+            "email": "webmikez@gmail.com",
         }			
     ],
 	"minimum-stability": "dev",
@@ -23,7 +20,7 @@
     },
     "autoload": {
         "psr-0": {
-            "katzz0\\yandexmaps\\": ""
+            "webmikez\\yandexmaps\\": ""
         }
     }
 }
