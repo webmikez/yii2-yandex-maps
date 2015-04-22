@@ -62,7 +62,13 @@ class Canvas extends Widget
     {
         Api::registerApiFile($this->map);
 
-        $js = "\nymaps.ready(function() {\n" .(string) $this->map ."\n});";
+        if(Api::$onLoad) {
+            $js = "var yandex_map; function init() {"
+            . "\n" . (string) $this->map ."\n"
+            . "}";
+        } else {
+            $js = "\nymaps.ready(function() {\n" . (string)$this->map . "\n});";
+        }
         \Yii::$app->view->registerJs($js, View::POS_READY);
     }
 }

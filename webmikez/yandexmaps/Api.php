@@ -46,6 +46,8 @@ class Api extends Component
      */
     public static $packages = ['package.full'];
 
+    public static $onLoad;
+
     /**
      * @var Map Current Map
      */
@@ -74,7 +76,12 @@ class Api extends Component
             '://' . self::$uri . '/' .
             self::$version
             . '/?lang=' . self::$language
-            . '&load=' . self::$packages;
+            . '&load=' . self::$packages
+        ;
+
+        if(self::$onLoad) {
+            $url .= '&onload=' . self::$onLoad;
+        }
 
         \Yii::$app->view->registerJsFile($url, ['position' => View::POS_END], self::$uri);
     }
