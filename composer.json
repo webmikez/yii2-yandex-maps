@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": "webmikez",
-            "email": "webmikez@gmail.com",
+            "email": "webmikez@gmail.com"
         }			
     ],
 	"minimum-stability": "dev",
@@ -19,8 +19,6 @@
         "yiisoft/yii2": "2.0.*"
     },
     "autoload": {
-        "psr-0": {
-            "webmikez\\yandexmaps\\": ""
-        }
+      "classmap": ["webmikez"]
     }
 }
