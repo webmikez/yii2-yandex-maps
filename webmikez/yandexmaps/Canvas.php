@@ -69,6 +69,6 @@ class Canvas extends Widget
         } else {
             $js = "\nymaps.ready(function() {\n" . (string)$this->map . "\n});";
         }
-        \Yii::$app->view->registerJs($js, View::POS_READY);
+        \Yii::$app->view->registerJs($js, View::POS_BEGIN);
     }
 }
