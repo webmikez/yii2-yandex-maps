@@ -16,6 +16,7 @@ class Api extends Component
      */
     public static $protocol = 'http';
 
+    public static $apikey = '';
     /**
      * @var string Uri for the JS map API
      */
@@ -77,7 +78,8 @@ class Api extends Component
             self::$version
             . '/?lang=' . self::$language
             . '&load=' . self::$packages
-        ;
+            . (!empty(self::$apikey)? '&apikey=' . self::$apikey: '')
+            ;
 
         if(self::$onLoad) {
             $url .= '&onload=' . self::$onLoad;
